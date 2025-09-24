@@ -17,12 +17,10 @@ Construido con **Streamlit**, permite a cualquier persona proyectar escenarios f
 ## ⚙️ Instalación local
 
 1. Clona este repositorio:
-
    ```bash
    git clone https://github.com/jcgmU/EDO.git
    cd EDO
    ```
-
 2. (Opcional) Crea un entorno virtual:
 
    ```bash
