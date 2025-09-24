@@ -19,8 +19,8 @@ Construido con **Streamlit**, permite a cualquier persona proyectar escenarios f
 1. Clona este repositorio:
 
    ```bash
-   git clone https://github.com/tu-usuario/ahorro-ode.git
-   cd ahorro-ode
+   git clone https://github.com/jcgmU/EDO.git
+   cd EDO
    ```
 
 2. (Opcional) Crea un entorno virtual:
@@ -64,7 +64,7 @@ Construido con **Streamlit**, permite a cualquier persona proyectar escenarios f
 ## 📂 Estructura del proyecto
 
 ```
-ahorro-ode/
+EDO/
 ├── app_streamlit.py   # Interfaz Streamlit
 ├── ode_finance.py     # Motor matemático (modelos EDO)
 ├── requirements.txt   # Dependencias
