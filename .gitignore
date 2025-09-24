@@ -1,0 +1,34 @@
+# En el directorio de tu proyecto
+cd /Users/jcgm/Desktop/ODE/
+cat > .gitignore << EOL
+# Entorno virtual
+venv/
+
+# Archivos Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribución/empaquetado
+*.egg-info/
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Archivos de ambiente
+.env
+.venv
+env/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+EOL
