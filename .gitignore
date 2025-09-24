@@ -1,6 +1,5 @@
-# En el directorio de tu proyecto
-cd /Users/jcgm/Desktop/ODE/
-cat > .gitignore << EOL
+# Sobrescribir el archivo .gitignore con el contenido correcto
+cat > .gitignore << 'EOF'
 # Entorno virtual
 venv/
 
@@ -31,4 +30,4 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
-EOL
+EOF
