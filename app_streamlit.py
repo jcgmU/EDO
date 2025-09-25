@@ -150,7 +150,7 @@ with tab1:
 
     st.markdown(
         """
-        Usa este modelo si **aportas una cantidad constante cada año** y quieres ver
+        Usa este modelo si **aportes una cantidad constante cada año** y quieres ver
         cómo crece tu ahorro con el tiempo. Es el más simple y directo.
         """
     )
@@ -174,7 +174,7 @@ with tab1:
         with col1a:
             S0 = st.number_input(
                 "Ahorro inicial S(0) [COP]",
-                value=0.0,
+                value=0.0,  # ✅ Cambiado a 0
                 step=1e6,
                 format="%.0f",
                 help="¿Cuánto tienes hoy ahorrado? Ejemplo: 3,000,000",
@@ -182,7 +182,7 @@ with tab1:
 
             r = st.number_input(
                 "Tasa r [1/año]",
-                value=0.12,
+                value=0.0,  # ✅ Cambiado a 0
                 step=0.01,
                 format="%.4f",
                 help="Velocidad de cambio del modelo. Valores típicos: 0.05–0.20 (5%-20% anual)",
@@ -191,7 +191,7 @@ with tab1:
         with col1b:
             A = st.number_input(
                 "Aporte neto anual A [COP/año]",
-                value=1e7,
+                value=0.0,  # ✅ Cambiado a 0
                 step=1e6,
                 format="%.0f",
                 help="Aportes menos retiros al año. Ejemplo: 10,000,000",
@@ -297,7 +297,7 @@ with tab2:
         with col1a:
             S0_step = st.number_input(
                 "Ahorro inicial S(0) [COP]",
-                value=0.0,
+                value=0.0,  # ✅ Ya estaba en 0
                 step=1e6,
                 format="%.0f",
                 key="s0_step",
@@ -306,7 +306,7 @@ with tab2:
 
             V0 = st.number_input(
                 "Ritmo inicial S'(0) [COP/año]",
-                value=0.0,
+                value=0.0,  # ✅ Ya estaba en 0
                 step=1e6,
                 format="%.0f",
                 help="Velocidad inicial de cambio (normalmente 0)",
@@ -314,7 +314,7 @@ with tab2:
 
             Sstar = st.number_input(
                 "Nueva meta S★ [COP]",
-                value=6e7,
+                value=0.0,  # ✅ Cambiado a 0
                 step=1e6,
                 format="%.0f",
                 help="Nivel objetivo que quieres alcanzar",
@@ -323,7 +323,7 @@ with tab2:
         with col1b:
             wn = st.number_input(
                 "Velocidad de ajuste ωₙ [1/año]",
-                value=1.0,
+                value=0.0,  # ✅ Cambiado a 0
                 step=0.1,
                 format="%.2f",
                 help="Qué tan rápido corriges el rumbo (0.5–2.0 son valores típicos)",
@@ -331,7 +331,7 @@ with tab2:
 
             zeta = st.number_input(
                 "Factor de amortiguación ζ",
-                value=0.7,
+                value=0.0,  # ✅ Cambiado a 0
                 step=0.05,
                 format="%.2f",
                 help="Controla las oscilaciones. ζ≈1 = rápido sin rebote; ζ<1 = puede oscilar",
@@ -411,15 +411,16 @@ with tab2:
                 )
 
                 # Bandas de tolerancia
-                tol_band = 0.05 * abs(Sstar)
-                ax.fill_between(
-                    t,
-                    Sstar - tol_band,
-                    Sstar + tol_band,
-                    alpha=0.2,
-                    color="red",
-                    label="±5% tolerancia",
-                )
+                if Sstar != 0:
+                    tol_band = 0.05 * abs(Sstar)
+                    ax.fill_between(
+                        t,
+                        Sstar - tol_band,
+                        Sstar + tol_band,
+                        alpha=0.2,
+                        color="red",
+                        label="±5% tolerancia",
+                    )
 
                 ax.set_xlabel("Tiempo [años]")
                 ax.set_ylabel("Saldo S(t) [COP]")
@@ -479,7 +480,7 @@ with tab3:
         with col1a:
             S0_sin = st.number_input(
                 "Ahorro inicial S(0) [COP]",
-                value=0.0,
+                value=0.0,  # ✅ Ya estaba en 0
                 step=1e6,
                 format="%.0f",
                 key="s0_sin",
@@ -488,7 +489,7 @@ with tab3:
 
             V0_sin = st.number_input(
                 "Ritmo inicial S'(0) [COP/año]",
-                value=0.0,
+                value=0.0,  # ✅ Ya estaba en 0
                 step=1e6,
                 format="%.0f",
                 key="v0_sin",
@@ -497,7 +498,7 @@ with tab3:
 
             Sstar_sin = st.number_input(
                 "Meta S★ [COP]",
-                value=6e7,
+                value=0.0,  # ✅ Cambiado a 0
                 step=1e6,
                 format="%.0f",
                 key="sstar_sin",
@@ -506,7 +507,7 @@ with tab3:
 
             wn_sin = st.number_input(
                 "Velocidad de ajuste ωₙ [1/año]",
-                value=1.0,
+                value=0.0,  # ✅ Cambiado a 0
                 step=0.1,
                 format="%.2f",
                 key="wn_sin",
@@ -516,7 +517,7 @@ with tab3:
         with col1b:
             zeta_sin = st.number_input(
                 "Factor de amortiguación ζ",
-                value=0.7,
+                value=0.0,  # ✅ Cambiado a 0
                 step=0.05,
                 format="%.2f",
                 key="zeta_sin",
@@ -525,7 +526,7 @@ with tab3:
 
             F = st.number_input(
                 "Amplitud estacional F [COP]",
-                value=1e7,
+                value=0.0,  # ✅ Cambiado a 0
                 step=1e6,
                 format="%.0f",
                 help="Magnitud del pico estacional",
@@ -541,13 +542,13 @@ with tab3:
                     "Trimestral (8π)",
                     "Mensual (24π)",
                 ],
-                index=1,
+                index=0,  # ✅ Cambiado a "Personalizada" por defecto
             )
 
             if freq_option == "Personalizada":
                 Omega = st.number_input(
                     "Ω [rad/año]",
-                    value=2 * np.pi,
+                    value=0.0,  # ✅ Cambiado a 0
                     step=0.1,
                     format="%.3f",
                     help="Frecuencia personalizada",
@@ -583,7 +584,7 @@ with tab3:
         )
 
         st.subheader("Respuesta de Frecuencia")
-        if wn_sin > 0:
+        if wn_sin > 0 and Omega > 0:
             # Calcular respuesta teórica
             denom = np.sqrt(
                 (wn_sin**2 - Omega**2) ** 2 + (2 * zeta_sin * wn_sin * Omega) ** 2
