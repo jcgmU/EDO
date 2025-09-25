@@ -87,8 +87,23 @@ with st.sidebar:
 
 # -------------------- Funciones auxiliares --------------------
 def format_currency(value):
-    """Formatear valores monetarios."""
-    return f"${value:,.0f}"
+    """Formatear valores monetarios con puntos como separadores de miles."""
+    return f"${value:,.0f}".replace(",", ".")
+
+
+def format_currency_input(value):
+    """Formatear input monetario con puntos pero mantener valor numérico."""
+    if value == 0:
+        return "0"
+    return f"{value:,.0f}".replace(",", ".")
+
+
+def parse_currency_input(text_value):
+    """Convertir texto con puntos a número para cálculos."""
+    if isinstance(text_value, str):
+        # Remover puntos y convertir a float
+        return float(text_value.replace(".", ""))
+    return float(text_value)
 
 
 def create_download_section(fig, data_dict, base_filename):
@@ -172,30 +187,43 @@ with tab1:
 
         col1a, col1b = st.columns(2)
         with col1a:
-            S0 = st.number_input(
+            # Input con formato de moneda pero manteniendo valor numérico
+            S0_text = st.text_input(
                 "Ahorro inicial S(0) [COP]",
-                value=0.0,  # ✅ Cambiado a 0
-                step=1e6,
-                format="%.0f",
-                help="¿Cuánto tienes hoy ahorrado? Ejemplo: 3,000,000",
+                value="0",
+                help="¿Cuánto tienes hoy ahorrado? Ejemplo: 3.000.000",
+                placeholder="Ej: 3.000.000",
             )
+
+            # Convertir a número para cálculos
+            try:
+                S0 = parse_currency_input(S0_text) if S0_text else 0.0
+            except ValueError:
+                st.error("Ingresa un valor numérico válido para el ahorro inicial")
+                S0 = 0.0
 
             r = st.number_input(
                 "Tasa r [1/año]",
-                value=0.0,  # ✅ Cambiado a 0
+                value=0.0,
                 step=0.01,
                 format="%.4f",
                 help="Velocidad de cambio del modelo. Valores típicos: 0.05–0.20 (5%-20% anual)",
             )
 
         with col1b:
-            A = st.number_input(
+            A_text = st.text_input(
                 "Aporte neto anual A [COP/año]",
-                value=0.0,  # ✅ Cambiado a 0
-                step=1e6,
-                format="%.0f",
-                help="Aportes menos retiros al año. Ejemplo: 10,000,000",
+                value="0",
+                help="Aportes menos retiros al año. Ejemplo: 10.000.000",
+                placeholder="Ej: 10.000.000",
             )
+
+            # Convertir a número para cálculos
+            try:
+                A = parse_currency_input(A_text) if A_text else 0.0
+            except ValueError:
+                st.error("Ingresa un valor numérico válido para el aporte anual")
+                A = 0.0
 
             tmax = st.number_input(
                 "Horizonte temporal [años]",
@@ -224,7 +252,7 @@ with tab1:
         """
         )
 
-        if model == ModelType.DECAY.value and r > 0:
+        if model == ModelType.DECAY.value and r > 0 and A > 0:
             equilibrium = A / r
             st.info(f"Equilibrio: {format_currency(equilibrium)}")
 
@@ -250,14 +278,14 @@ with tab1:
                 ax.grid(True, alpha=0.3)
                 ax.ticklabel_format(style="plain", axis="y")
 
-                # Formatear eje Y
+                # Formatear eje Y con puntos
                 ax.yaxis.set_major_formatter(
                     plt.FuncFormatter(lambda x, p: f"{x/1e6:.1f}M")
                 )
 
                 st.pyplot(fig, use_container_width=True)
 
-                # Mostrar estadísticas
+                # Mostrar estadísticas con formato de moneda
                 col_stats1, col_stats2, col_stats3 = st.columns(3)
                 with col_stats1:
                     st.metric("Valor Inicial", format_currency(S[0]))
@@ -295,35 +323,50 @@ with tab2:
 
         col1a, col1b = st.columns(2)
         with col1a:
-            S0_step = st.number_input(
+            S0_step_text = st.text_input(
                 "Ahorro inicial S(0) [COP]",
-                value=0.0,  # ✅ Ya estaba en 0
-                step=1e6,
-                format="%.0f",
-                key="s0_step",
+                value="0",
+                key="s0_step_text",
                 help="¿Cuánto tienes hoy ahorrado?",
+                placeholder="Ej: 5.000.000",
             )
 
-            V0 = st.number_input(
+            try:
+                S0_step = parse_currency_input(S0_step_text) if S0_step_text else 0.0
+            except ValueError:
+                st.error("Ingresa un valor numérico válido")
+                S0_step = 0.0
+
+            V0_text = st.text_input(
                 "Ritmo inicial S'(0) [COP/año]",
-                value=0.0,  # ✅ Ya estaba en 0
-                step=1e6,
-                format="%.0f",
+                value="0",
                 help="Velocidad inicial de cambio (normalmente 0)",
+                placeholder="Ej: 1.000.000",
             )
 
-            Sstar = st.number_input(
+            try:
+                V0 = parse_currency_input(V0_text) if V0_text else 0.0
+            except ValueError:
+                st.error("Ingresa un valor numérico válido")
+                V0 = 0.0
+
+            Sstar_text = st.text_input(
                 "Nueva meta S★ [COP]",
-                value=0.0,  # ✅ Cambiado a 0
-                step=1e6,
-                format="%.0f",
+                value="0",
                 help="Nivel objetivo que quieres alcanzar",
+                placeholder="Ej: 60.000.000",
             )
+
+            try:
+                Sstar = parse_currency_input(Sstar_text) if Sstar_text else 0.0
+            except ValueError:
+                st.error("Ingresa un valor numérico válido")
+                Sstar = 0.0
 
         with col1b:
             wn = st.number_input(
                 "Velocidad de ajuste ωₙ [1/año]",
-                value=0.0,  # ✅ Cambiado a 0
+                value=0.0,
                 step=0.1,
                 format="%.2f",
                 help="Qué tan rápido corriges el rumbo (0.5–2.0 son valores típicos)",
@@ -331,7 +374,7 @@ with tab2:
 
             zeta = st.number_input(
                 "Factor de amortiguación ζ",
-                value=0.0,  # ✅ Cambiado a 0
+                value=0.0,
                 step=0.05,
                 format="%.2f",
                 help="Controla las oscilaciones. ζ≈1 = rápido sin rebote; ζ<1 = puede oscilar",
@@ -433,7 +476,7 @@ with tab2:
 
                 st.pyplot(fig, use_container_width=True)
 
-                # Mostrar métricas
+                # Mostrar métricas con formato de moneda
                 col_met1, col_met2, col_met3, col_met4 = st.columns(4)
                 with col_met1:
                     st.metric(
@@ -478,36 +521,53 @@ with tab3:
 
         col1a, col1b = st.columns(2)
         with col1a:
-            S0_sin = st.number_input(
+            S0_sin_text = st.text_input(
                 "Ahorro inicial S(0) [COP]",
-                value=0.0,  # ✅ Ya estaba en 0
-                step=1e6,
-                format="%.0f",
-                key="s0_sin",
+                value="0",
+                key="s0_sin_text",
                 help="¿Cuánto tienes hoy ahorrado?",
+                placeholder="Ej: 10.000.000",
             )
 
-            V0_sin = st.number_input(
+            try:
+                S0_sin = parse_currency_input(S0_sin_text) if S0_sin_text else 0.0
+            except ValueError:
+                st.error("Ingresa un valor numérico válido")
+                S0_sin = 0.0
+
+            V0_sin_text = st.text_input(
                 "Ritmo inicial S'(0) [COP/año]",
-                value=0.0,  # ✅ Ya estaba en 0
-                step=1e6,
-                format="%.0f",
-                key="v0_sin",
+                value="0",
+                key="v0_sin_text",
                 help="Velocidad inicial (normalmente 0)",
+                placeholder="Ej: 500.000",
             )
 
-            Sstar_sin = st.number_input(
+            try:
+                V0_sin = parse_currency_input(V0_sin_text) if V0_sin_text else 0.0
+            except ValueError:
+                st.error("Ingresa un valor numérico válido")
+                V0_sin = 0.0
+
+            Sstar_sin_text = st.text_input(
                 "Meta S★ [COP]",
-                value=0.0,  # ✅ Cambiado a 0
-                step=1e6,
-                format="%.0f",
-                key="sstar_sin",
+                value="0",
+                key="sstar_sin_text",
                 help="Nivel objetivo promedio",
+                placeholder="Ej: 60.000.000",
             )
+
+            try:
+                Sstar_sin = (
+                    parse_currency_input(Sstar_sin_text) if Sstar_sin_text else 0.0
+                )
+            except ValueError:
+                st.error("Ingresa un valor numérico válido")
+                Sstar_sin = 0.0
 
             wn_sin = st.number_input(
                 "Velocidad de ajuste ωₙ [1/año]",
-                value=0.0,  # ✅ Cambiado a 0
+                value=0.0,
                 step=0.1,
                 format="%.2f",
                 key="wn_sin",
@@ -517,20 +577,25 @@ with tab3:
         with col1b:
             zeta_sin = st.number_input(
                 "Factor de amortiguación ζ",
-                value=0.0,  # ✅ Cambiado a 0
+                value=0.0,
                 step=0.05,
                 format="%.2f",
                 key="zeta_sin",
                 help="Controla oscilaciones",
             )
 
-            F = st.number_input(
+            F_text = st.text_input(
                 "Amplitud estacional F [COP]",
-                value=0.0,  # ✅ Cambiado a 0
-                step=1e6,
-                format="%.0f",
+                value="0",
                 help="Magnitud del pico estacional",
+                placeholder="Ej: 5.000.000",
             )
+
+            try:
+                F = parse_currency_input(F_text) if F_text else 0.0
+            except ValueError:
+                st.error("Ingresa un valor numérico válido")
+                F = 0.0
 
             # Selectbox para frecuencia común
             freq_option = st.selectbox(
@@ -542,13 +607,13 @@ with tab3:
                     "Trimestral (8π)",
                     "Mensual (24π)",
                 ],
-                index=0,  # ✅ Cambiado a "Personalizada" por defecto
+                index=0,
             )
 
             if freq_option == "Personalizada":
                 Omega = st.number_input(
                     "Ω [rad/año]",
-                    value=0.0,  # ✅ Cambiado a 0
+                    value=0.0,
                     step=0.1,
                     format="%.3f",
                     help="Frecuencia personalizada",
@@ -584,7 +649,7 @@ with tab3:
         )
 
         st.subheader("Respuesta de Frecuencia")
-        if wn_sin > 0 and Omega > 0:
+        if wn_sin > 0 and Omega > 0 and F > 0:
             # Calcular respuesta teórica
             denom = np.sqrt(
                 (wn_sin**2 - Omega**2) ** 2 + (2 * zeta_sin * wn_sin * Omega) ** 2
@@ -653,7 +718,7 @@ with tab3:
                 plt.tight_layout()
                 st.pyplot(fig, use_container_width=True)
 
-                # Mostrar métricas de la respuesta
+                # Mostrar métricas de la respuesta con formato de moneda
                 col_freq1, col_freq2, col_freq3 = st.columns(3)
                 with col_freq1:
                     st.metric("Amplitud de oscilación", format_currency(Ahat))
